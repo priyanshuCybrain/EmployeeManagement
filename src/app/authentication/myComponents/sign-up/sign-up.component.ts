@@ -535,4 +535,4 @@ export class SignUpComponent {
     });
   }
 }
-// changes made
+// changes made from the git
