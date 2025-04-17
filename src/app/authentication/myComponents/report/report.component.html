@@ -1,0 +1,185 @@
+<div class="container mt-5">
+    <div class="row" style="display: flex; justify-content: center; align-items: center;">
+
+        <!-- <h1 class="mb-3"><b>Report Form</b></h1> -->
+        <div class="col-md-12">
+            <form [formGroup]="reportFormInput" (ngSubmit)="onSubmit()">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label>Teacher Name</label>
+                            <input type="text" class="form-control" formControlName="reportTeacherName"
+                                placeholder="Enter teacher name" />
+                            <small class="text-danger"
+                                *ngIf="reportFormInput.get('reportTeacherName')?.invalid && reportFormInput.get('reportTeacherName')?.touched">
+                                Teacher Name must be at least 3 characters
+                            </small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label for="reportTeacherType">Teacher Type</label>
+                            <select class="form-control" formControlName="reportTeacherType" id="reportTeacherType">
+                                <option value="">Select Teacher Type</option>
+                                <option *ngFor="let type of teacherType" [value]="type.teacherTypeName">
+                                    {{ type.teacherTypeName }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label>Gender</label>
+                            <select class="form-control" formControlName="gender" id="gender">
+                                <option value="">Select gender</option>
+                                <option *ngFor="let gender of genderOptions" [value]="gender">
+                                    {{ gender }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3 mt-3 ">
+                            <label for="ClassName" class="mx-2">Classes</label>
+                            <mat-form-field>
+                                <mat-label>Classes</mat-label>
+                                <mat-select formControlName="ClassName" multiple #classDropdown>
+                                    <mat-option (click)="selectAllClasses(classDropdown)" [value]="'all'">Select
+                                        All</mat-option>
+                                    <mat-option *ngFor="let classes of classData" [value]="classes.className">
+                                        {{ classes.className }}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- <div class="mb-3">
+                    <label>From date</label>
+                    <input type="date" class="form-control" formControlName="fromDate" />
+                </div>
+
+                <div class="mb-3">
+                    <label>To date</label>
+                    <input type="date" class="form-control" formControlName="toDate" />
+                </div> -->
+
+                <div
+                    style="display: flex; justify-content: space-between; gap: 10px; margin-top: 20px; width: fit-content;">
+                    <button type="submit" class="btn btn-primary" [disabled]="reportFormInput.invalid"
+                        style="flex: 1; background-color: #007bff; border-color: #007bff; color: white; padding: 12px 20px; font-size: 16px; font-weight: 500; border-radius: 5px; transition: all 0.3s ease;">
+                        Search
+                    </button>
+
+                    <button type="button" class="btn btn-info" (click)="ngOnInit(); getAllTeachers()"
+                        style="flex: 1; background-color: #17a2b8; border-color: #17a2b8; color: white; padding: 12px 20px; font-size: 16px; font-weight: 500; border-radius: 5px; transition: all 0.3s ease;">
+                        Reset
+                    </button>
+
+                    <button class="btn btn-primary print-btn" (click)="printTable()"
+                        style="flex: 1; background-color: #007bff; border-color: #007bff; color: white; padding: 12px 20px; font-size: 16px; font-weight: 500; border-radius: 5px; transition: all 0.3s ease;">
+                        Print Table
+                    </button>
+
+                    <button class="btn btn-success export-btn" (click)="exportTableToExcel()"
+                        style="flex: 1; background-color: #28a745; border-color: #28a745; color: white; padding: 12px 20px; font-size: 16px; font-weight: 500; border-radius: 5px; transition: all 0.3s ease;">
+                        Export to Excel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <table class="table table-bordered visually-hidden" id="printTable">
+        <thead class="table-dark">
+            <tr>
+                <th>S.No</th>
+                <th>Teacher Name</th>
+                <th>Teacher Type</th>
+                <th>DOB</th>
+                <th>Gender</th>
+                <th>Address</th>
+                <th>Vegetarian</th>
+                <th>Classes</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let teacherReportOutput of filteredTeacherReports, let i = index">
+                <td>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
+                <td>{{ teacherReportOutput.teacherName ?? 'NA' }}</td>
+                <td>{{ teacherReportOutput.teacherTypeName ?? 'NA' }}</td>
+                <td>{{ teacherReportOutput.teacherDob ?? 'NA' }}</td>
+                <td>{{ teacherReportOutput.gender ?? 'NA' }}</td>
+                <td>{{ teacherReportOutput.address ?? 'NA' }}</td>
+                <td>{{ teacherReportOutput.isVeg ?? 'NA' }}</td>
+                <td>{{ teacherReportOutput.classNames ?? 'NA' }}</td>
+            </tr>
+        </tbody>
+    </table>
+    <br>
+
+    <div class="col-md-12">
+
+        <h1><b>Report List</b></h1>
+
+
+        <!-- <form class="form-inline my-2 my-lg-0" style="width: 400px; display: flex;" (ngSubmit)="searchTeacher()">
+                <input [(ngModel)]="searchText" name="searchText" class="form-control mr-sm-2" type="search"
+                    placeholder="Search" aria-label="Search" required (input)="searchTeacher()" />
+            </form><br> -->
+        <table class="table table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>S.No</th>
+                    <th>Teacher Name</th>
+                    <th>Teacher Type</th>
+                    <th>DOB</th>
+                    <th>Gender</th>
+                    <th>Address</th>
+                    <th>Vegetarian</th>
+                    <th>Classes</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr
+                    *ngFor="let teacherReportOutput of filteredTeacherReports | paginate: { itemsPerPage: itemsPerPage, currentPage: currentPage }; let i = index">
+                    <td>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
+                    <td>{{ teacherReportOutput.teacherName ?? 'NA' }}</td>
+                    <td>{{ teacherReportOutput.teacherTypeName ?? 'NA' }}</td>
+                    <td>{{ teacherReportOutput.teacherDob ?? 'NA' }}</td>
+                    <td>{{ teacherReportOutput.gender ?? 'NA' }}</td>
+                    <td>{{ teacherReportOutput.address ?? 'NA' }}</td>
+                    <td>{{ teacherReportOutput.isVeg ?? 'NA' }}</td>
+                    <td>{{ teacherReportOutput.classNames ?? 'NA' }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div
+            style="display: flex; justify-content: space-between; align-items: center; gap: 20px; margin-top: 30px; margin-bottom: 30px; padding: 10px; background-color: #f8f9fa; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+
+            <!-- <button class="btn btn-primary print-btn" (click)="printTable()"
+                style="flex: 1; max-width: 150px; background-color: #007bff; border-color: #007bff; color: white; padding: 12px 20px; font-size: 16px; font-weight: 500; border-radius: 5px; transition: all 0.3s ease;">
+                Print Table
+            </button>
+            <button class="btn btn-success export-btn" (click)="exportTableToExcel()"
+            style="flex: 1; max-width: 150px; background-color: #28a745; border-color: #28a745; color: white; padding: 12px 20px; font-size: 16px; font-weight: 500; border-radius: 5px; transition: all 0.3s ease;">
+            Export to Excel
+        </button> -->
+
+            <pagination-controls (pageChange)="currentPage = $event"
+                style="flex: 2; text-align: center; font-size: 16px; font-weight: 500; color: #333;">
+            </pagination-controls>
+
+        </div>
+        <!--  
+        <div class="text-center mt-3">
+        </div>  -->
+    </div>
+
+
+
+</div>
+
+<!-- <router-outlet></router-outlet> -->

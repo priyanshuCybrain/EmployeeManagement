@@ -1,0 +1,25 @@
+table {
+  border-collapse: collapse; /* Ensures borders don't overlap */
+  width: 100%;
+}
+
+th,
+td {
+  border: 1px solid black; /* Adds vertical and horizontal borders */
+  text-align: center; /* Centers the text */
+  padding: 8px; /* Adds padding for better readability */
+}
+
+th {
+  background-color: #f2f2f2; /* Light gray background for headers */
+}
+
+.table {
+  width: 100%;
+  text-align: center;
+}
+
+.table th,
+.table td {
+  vertical-align: middle;
+}

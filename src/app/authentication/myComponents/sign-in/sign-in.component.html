@@ -1,0 +1,36 @@
+<div class="container mt-2">
+
+  <h2 class="mb-3 text-3xl font-semibold">Sign-In Form: </h2>
+
+  <form [formGroup]="signInForm" (ngSubmit)="signIn()">
+    <div class="mb-2">
+      <label>Username</label>
+      <input type="text" class="form-control" formControlName="userName" placeholder="Enter Username" />
+      <small class="text-danger" *ngIf="signInForm.get('text')?.invalid && signInForm.get('text')?.touched">
+        Username is required
+      </small>
+    </div>
+
+    <div class="mb-2 mt-4">
+      <label>Password</label>
+      <input type="password" class="form-control" formControlName="password" placeholder="Enter password" />
+      <small class="text-danger" *ngIf="signInForm.get('password')?.invalid && signInForm.get('password')?.touched">
+        Password is required
+      </small>
+    </div>
+
+    <button type="submit" class="btn btn-primary" [disabled]="signInForm.invalid">
+      Sign-In
+    </button>
+
+    <!-- <div class="buttons" style="display: flex; justify-content: center; gap: 20px; width: 100%;">
+      <button type="button" class="btn btn-info" style="flex: 1;" [routerLink]="['/myComponents/sign-up']">
+        Get Teachers data
+      </button>
+
+      <button type="button" class="btn btn-warning" style="flex: 1;" [routerLink]="['/myComponents/report']">
+        Get Teachers Report
+      </button>
+    </div> -->
+
+    <!-- <router-outlet></router-outlet> -->

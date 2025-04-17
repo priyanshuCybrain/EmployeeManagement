@@ -1,0 +1,114 @@
+<div class="container mt-5">
+  <!-- Form Section -->
+  <div class=" mb-5">
+    <div>
+      <!-- <h4 class="card-title text-secondary mb-4 text-center">Add Punch Details</h4> -->
+
+      <h5 class="mb-3 text-3xl font-semibold">Add Punch Details</h5>
+      <form [formGroup]="PunchDetailsForm" (ngSubmit)="onSubmit()">
+        <div class="row g-4 align-items-center">
+          <!-- Teacher Name -->
+          <div class="col-md-3 d-flex flex-column">
+            <label for="teacherName" class="form-label fw-bold">Teacher Name</label>
+            <select class="form-select" formControlName="teacherName" id="teacherName">
+              <option value="" disabled>Select Teacher Name</option>
+              <option *ngFor="let TeacherName of allTeachers" [value]="TeacherName.teacherId">
+                {{ TeacherName.teacherName }}
+              </option>
+            </select>
+            <small class="text-danger"
+              *ngIf="PunchDetailsForm.get('teacherName')?.invalid && PunchDetailsForm.get('teacherName')?.touched">
+              Teacher Name is required
+            </small>
+          </div>
+
+          <!-- Date -->
+          <div class="col-md-3 d-flex flex-column">
+            <label for="date" class="form-label fw-bold">Date</label>
+            <input type="date" class="form-control" formControlName="date" placeholder="Select Date" required />
+            <small class="text-danger"
+              *ngIf="PunchDetailsForm.get('date')?.invalid && PunchDetailsForm.get('date')?.touched">
+              Date is required
+            </small>
+          </div>
+
+          <!-- In-Time -->
+          <div class="col-md-3 d-flex flex-column">
+            <label for="inTime" class="form-label fw-bold">In-Time</label>
+            <mat-form-field class="w-100">
+              <mat-label>Pick a time</mat-label>
+              <input matInput formControlName="inTime" [matTimepicker]="pickerIn">
+              <mat-timepicker-toggle matIconSuffix [for]="pickerIn"></mat-timepicker-toggle>
+              <mat-timepicker #pickerIn></mat-timepicker>
+              <mat-error *ngIf="PunchDetailsForm.get('inTime')?.invalid && PunchDetailsForm.get('inTime')?.touched">
+                In Time is required
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Out-Time -->
+          <div class="col-md-3 d-flex flex-column">
+            <label for="outTime" class="form-label fw-bold">Out-Time</label>
+            <mat-form-field class="w-100">
+              <mat-label>Pick a time</mat-label>
+              <input matInput formControlName="outTime" [matTimepicker]="pickerOut">
+              <mat-timepicker-toggle matIconSuffix [for]="pickerOut"></mat-timepicker-toggle>
+              <mat-timepicker #pickerOut></mat-timepicker>
+              <mat-error *ngIf="PunchDetailsForm.get('outTime')?.invalid && PunchDetailsForm.get('outTime')?.touched">
+                Out-Time is required
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="mt-4 text-end">
+          <button type="submit" class="btn btn-primary px-4 py-2" (click)="PunchDetailsForm.markAllAsTouched()">
+            Submit
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Table Section -->
+  <div>
+    <div>
+
+      <div class="text-center mt-4" style="display: flex;">
+        <h5 class="mb-3 text-3xl font-semibold">Punch Details List</h5>
+        <form class="form-inline my-2 my-lg-0"
+          style="width: 640px; display: flex; align-items: end; justify-content: flex-end; margin-left: auto;"
+          (ngSubmit)="searchTeacher()">
+          <input style="margin-bottom: auto ;" [(ngModel)]="searchText" name="searchText" class="form-control mr-sm-2"
+            type="search" placeholder="Search" aria-label="Search" required (input)="searchTeacher()" />
+        </form><br>
+      </div>
+
+      <table class="table table-bordered table-hover text-center">
+        <thead class="table-dark">
+          <tr>
+            <th>Teacher Name</th>
+            <th>Date</th>
+            <th>In-Time</th>
+            <th>Out-Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let Details of TeacherPunchDetails | paginate: { itemsPerPage: itemsPerPage, currentPage: currentPage }; let i = index">
+            <td>{{ Details.teacherName ?? 'NA' }}</td>
+            <td>{{ (Details.date | date: 'dd-MM-yyyy') ?? 'NA' }}</td>
+            <td>{{ Details.inTime ?? 'NA' }}</td>
+            <td>{{ Details.outTime ?? 'NA' }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="d-flex justify-content-center mt-4">
+        <pagination-controls (pageChange)="currentPage = $event" class="pagination"
+          style="font-size: 16px; font-weight: 500; color: #333;">
+        </pagination-controls>
+      </div>
+    </div>
+  </div>
+</div>

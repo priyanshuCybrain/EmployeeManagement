@@ -1,0 +1,9 @@
+.navbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
+
+.content-container {
+  margin-top: 10px;
+}

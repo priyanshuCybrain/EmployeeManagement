@@ -1,0 +1,71 @@
+<h2 mat-dialog-title style="justify-content: center; align-items: center;">Teacher Qualification Form</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="qualificationForm">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>S.No.</th>
+          <th>Qualification</th>
+          <th>Year</th>
+          <th>Max. Marks</th>
+          <th>Obtained Marks</th>
+          <th>Percentage</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody formArrayName="qualifications">
+        <tr *ngFor="let qualification of qualifications.controls; let i = index" [formGroupName]="i">
+          <td>{{ i + 1 }}</td>
+          <td>
+            <input type="text" class="form-control" formControlName="qualification" placeholder="Enter Qualification" />
+            <small class="text-danger"
+              *ngIf="qualification.get('qualification')?.invalid && qualification.get('qualification')?.touched">
+              Enter valid qualification
+            </small>
+          </td>
+          <td>
+            <input type="number" class="form-control" formControlName="year" placeholder="Enter Year" />
+            <small class="text-danger" *ngIf="qualification.get('year')?.invalid && qualification.get('year')?.touched">
+              Enter valid year in YYYY format
+            </small>
+          </td>
+          <td>
+            <input type="number" class="form-control" formControlName="maxmarks" placeholder="Enter Max Marks" />
+            <small class="text-danger"
+              *ngIf="qualification.get('maxmarks')?.invalid && qualification.get('maxmarks')?.touched">
+              Enter valid max marks
+            </small>
+          </td>
+          <td>
+            <input type="number" class="form-control" formControlName="obtmarks" placeholder="Enter Obtained Marks" />
+            <small class="text-danger"
+              *ngIf="qualification.get('obtmarks')?.invalid && qualification.get('obtmarks')?.touched">
+              Enter valid obtained marks (obtained marks &lt; max marks)
+            </small>
+          </td>
+          <td>
+            <input type="number" class="form-control" formControlName="percentage" placeholder="Enter Percentage" />
+            <small class="text-danger"
+              *ngIf="qualification.get('percentage')?.invalid && qualification.get('percentage')?.touched">
+              Required
+            </small>
+          </td>
+          <td>
+            <button type="button" class="btn btn-primary mx-1" (click)="addNew()">Add</button>
+            <button type="button" class="btn btn-danger mx-1" (click)="deleteCurrent(i)"
+              *ngIf="qualifications.length > 1">
+              Delete
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button color="primary" class="btn btn-primary mx-1" (click)="saveQualification()">Submit
+    Qualifications</button>
+  <button mat-button class="btn btn-secondary mx-1" (click)="closeModal()">Close</button>
+</mat-dialog-actions>

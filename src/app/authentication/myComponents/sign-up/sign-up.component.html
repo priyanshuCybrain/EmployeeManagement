@@ -1,0 +1,291 @@
+<div class="container">
+  <div class="row">
+    <div class="row g-4 align-items-center mb-5">
+      <form [formGroup]="teacherForm" (ngSubmit)="onEditSubmit()">
+        <!-- First Row: 4 Fields -->
+        <div class="row mb-3">
+          <div class="col-md-3">
+            <label>Teacher Name</label>
+            <input type="text" class="form-control" formControlName="teacherName" placeholder="Enter Teacher Name">
+            <small class="text-danger"
+              *ngIf="teacherForm.get('teacherName')?.invalid && teacherForm.get('teacherName')?.touched">
+              Teacher Name must be at least 3 characters
+            </small>
+          </div>
+
+          <div class="col-md-3">
+            <label for="teacherType" class="me-2">Teacher Type</label>
+            <select class="form-control" formControlName="teacherType" id="teacherType">
+              <option value="" disabled>Select Teacher Type</option>
+              <option *ngFor="let type of teacherType" [value]="type.teacherType">
+                {{ type.teacherTypeName }}
+              </option>
+            </select>
+            <small class="text-danger"
+              *ngIf="teacherForm.get('teacherType')?.invalid && teacherForm.get('teacherType')?.touched">
+              Teacher type is required
+            </small>
+          </div>
+
+          <div class="col-md-3">
+            <label for="teacherDob">Teacher DOB</label>
+            <input type="date" class="form-control" formControlName="teacherDob" required>
+            <small class="text-danger"
+              *ngIf="teacherForm.get('teacherDob')?.invalid && teacherForm.get('teacherDob')?.touched">
+              Date of Birth is required
+            </small>
+          </div>
+
+          <div class="col-md-3 mt-1 d-flex align-items-start flex-column">
+            <div class="form-check">
+              <p>Vegetarian </p>
+              <input class="form-check-input ms-1" type="checkbox" formControlName="isVeg" id="isVeg">
+              <label class="form-check-label ms-4" for="isVeg">Is Vegetarian?</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Second Row: Remaining Fields -->
+        <div class="row mb-3 mt-4">
+          <div class="col-md-3">
+            <label for="gender" class="me-2">Gender</label>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" formControlName="gender" value="Male" id="genderMale">
+              <label class="form-check-label" for="genderMale">Male</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" formControlName="gender" value="Female" id="genderFemale">
+              <label class="form-check-label" for="genderFemale">Female</label>
+            </div>
+          </div>
+
+          <div class="col-md-3">
+            <label for="classData" class="form-label me-2">Classes</label>
+            <div class="dropdown">
+              <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenuButton"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                Select Classes
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton"
+                style="max-height: 200px; overflow-y: auto;">
+                <li>
+                  <div class="form-check">
+                    <input class="form-check-input" formControlName="selectAll" type="checkbox"
+                      (change)="selectAllFunc()">
+                    <label class="form-check-label">Select all</label>
+                  </div>
+                </li>
+                <li *ngFor="let data of classData">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" [checked]="data.Selected"
+                      (change)="onCheckboxChange($event, data)">
+                    <label class="form-check-label">{{ data.className }}</label>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- <div class="col-md-3 d-flex align-items-start flex-column">
+            <label for="qualifications">Qualifications</label>
+            <button type="button" class="btn btn-info"
+              (click)="openDialog(); editQualification(submittedQualifications)">Add
+              Qualification</button>
+          </div> -->
+
+          <div class="col-md-3 d-flex align-items-start flex-column">
+            <label for="qualifications">Qualifications</label>
+            <button type="button" class="btn btn-info" (click)="openOrEditQualification(submittedQualifications)">
+              Add Qualification
+            </button>
+          </div>
+
+          <div class="col-md-3">
+            <label for="teacherAddress">Address</label>
+            <textarea placeholder="Enter address" class="form-control" formControlName="address" id="address"
+              rows="2"></textarea>
+            <small class="text-danger"
+              *ngIf="teacherForm.get('address')?.invalid && teacherForm.get('address')?.touched">
+              Address is required
+            </small>
+          </div>
+
+          <div class="col-md-3">
+            <label for="country" class="me-2">Country</label>
+            <select class="form-control" formControlName="country" (change)="getStates($event)">
+              <option value="" disabled selected>Select Country</option>
+              <option *ngFor="let country of Countries" [value]="country.countryId">
+                {{ country.countryName }}
+              </option>
+            </select>
+
+            <small class="text-danger"
+              *ngIf="teacherForm.get('country')?.invalid && teacherForm.get('country')?.touched">
+              Country is required
+            </small>
+          </div>
+
+          <!-- async getStates(event: Event) {
+            const selectElement = event.target as HTMLSelectElement;
+            const selectedCountryId = +selectElement.value;
+            const res = await this.MasterApiService.getStatesData(selectedCountryId);
+            this.States = res;
+            console.log('getStates:', this.States);
+          } -->
+
+          <div class="col-md-3">
+            <label for="state" class="me-2">State</label>
+            <select class="form-control" formControlName="state" id="state" (change)="getCities($event)">
+              <option value="" disabled>Select State</option>
+              <option *ngFor="let state of States" [value]="state.stateId">{{ state.stateName }}</option>
+            </select>
+            <small class="text-danger" *ngIf="teacherForm.get('state')?.invalid && teacherForm.get('state')?.touched">
+              State is required
+            </small>
+          </div>
+
+          <div class="col-md-3">
+            <label for="city" class="me-2">City</label>
+            <select class="form-control" formControlName="city" id="city">
+              <option value="" disabled>Select City</option>
+              <option *ngFor="let city of Cities" [value]="city.cityId">{{ city.cityName }}</option>
+            </select>
+            <small class="text-danger" *ngIf="teacherForm.get('city')?.invalid && teacherForm.get('city')?.touched">
+              City is required
+            </small>
+          </div>
+        </div>
+
+        <div class="row mt-3 mb-3 ">
+          <div class="col text-start">
+            <button type="submit" class="btn btn-primary btn-lg ms-2" (click)="teacherForm.markAllAsTouched()">
+              <i class="bi bi-check-circle"></i> Submit
+            </button>
+            <button class="btn btn-warning btn-lg ms-2" (click)="reset()">
+              <i class="bi bi-arrow-clockwise"></i> Reset
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class=" col-md-11 mx-auto mt-4 justify-content-center align-items-center">
+
+  <div class="text-center mt-4" style="display: flex;">
+    <h2 class="mb-3 text-3xl font-semibold">Teachers List</h2>
+
+    <form class="form-inline my-2 my-lg-0" style="width: 640px; display: flex; align-items: end; justify-content: flex-end; margin-left: auto;
+" (ngSubmit)="searchTeacher()">
+      <input style="margin-bottom: auto ;" [(ngModel)]="searchText" name="searchText" class="form-control mr-sm-2"
+        type="search" placeholder="Search" aria-label="Search" required (input)="searchTeacher()" />
+    </form><br>
+  </div>
+
+  <table class="table table-bordered">
+    <thead class="table-dark">
+      <tr>
+        <th>S.No</th>
+        <th>Teacher Name</th>
+        <th>Teacher DOB</th>
+        <th>Teacher Type</th>
+        <th>Address</th>
+        <th>Permanent Address</th>
+        <th>Gender</th>
+        <th>Vegetarian</th>
+        <th>Classes</th>
+        <th>Qualification</th>
+        <th class="text-center">Actions</th>
+      </tr>
+
+    </thead>
+    <tbody>
+      <tr
+        *ngFor="let teacher of filteredTeachers | paginate: { itemsPerPage: itemsPerPage, currentPage: currentPage }; let i = index">
+        <td>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
+        <td>{{ teacher.teacherName ?? 'NA' }}</td>
+        <td>{{ teacher.teacherDob?? 'NA' }}</td>
+        <td>{{ teacher.teacherTypeName?? 'NA' }}</td>
+        <td>{{ teacher.address?? 'NA' }}</td>
+        <td><span>City: </span>{{ teacher.homeCity?.cityName ?? 'NA' }},<br><span> State: </span> {{
+          teacher.homeState?.stateName ?? 'NA' }},<br><span> Country: </span> {{
+          teacher.homeCountry?.countryName ?? 'NA' }}</td>
+        <td>{{ teacher.gender?? 'NA' }}</td>
+        <td>{{ teacher.isVeg?? 'NA' }}</td>
+        <td>{{ teacher.classNames?.length ? teacher.classNames.join(', ') : 'NA' }}</td>
+        <!-- <td>{{ teacher.Qualifications.Qualification?? 'NA' }}</td> -->
+        <td>
+          <!-- <ng-container *ngIf="teacher.qualifications?.length; else noQuals"> -->
+          <!-- <div *ngFor="let qual of teacher.qualifications">
+              {{ qual.qualification }} ({{ qual.year }}) - {{ qual.percentage }}%
+            </div> -->
+          <div style="display: flex; justify-content: center; align-items: center; cursor: pointer;">
+            <i class="fa fa-eye" aria-hidden="true" (click)="getQualification(teacher);  "></i>
+          </div>
+
+          <!-- </ng-container> -->
+          <ng-template #noQuals>NA</ng-template>
+        </td>
+        <!-- used fa fa icon for icon -->
+
+        <td class="text-center">
+          <button class="btn btn-warning btn-sm me-2" (click)="editTeacher(teacher)">Edit</button>
+          <button class="btn btn-danger btn-sm" (click)="deleteTeacherCreation(teacher.teacherId)">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Pagination Controls -->
+  <div class="text-center mt-3">
+    <pagination-controls (pageChange)="currentPage = $event"></pagination-controls>
+  </div>
+
+  <!-- <div class="d-flex justify-content-between mt-4">
+    <button type="button" class="btn btn-info" [routerLink]="['/authentication/sign-in']">
+      Sign-In Page
+    </button>
+    <button type="button" class="btn btn-warning" [routerLink]="['/authentication/report']">
+      Get Teachers Report
+    </button>
+  </div> -->
+
+</div>
+
+<!-- Parent component template -->
+<div *ngIf="expandQual == true" class="modal" tabindex="-1"
+  style="display: flex; justify-content: center; align-items: center; background: rgba(0, 0, 0, 0.5); overflow-y: auto; overflow-x: hidden; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 1050;">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title text-center w-100">Qualification Details</h2>
+        <button type="button" class="btn-close" aria-label="Close" (click)="closeDialog()"></button>
+      </div>
+      <div class="modal-body">
+        <table class="table table-bordered mt-3">
+          <thead class="table-dark">
+            <tr>
+              <th>S.No.</th>
+              <th>Qualification</th>
+              <th>Year</th>
+              <th>Max. Marks</th>
+              <th>Obtained Marks</th>
+              <th>Percentage</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let qualification of singleQualification; let i = index">
+              <td>{{ i + 1 }}</td>
+              <td>{{ qualification.qualification ?? 'NA' }}</td>
+              <td>{{ qualification.year ?? 'NA' }}</td>
+              <td>{{ qualification.maxMarks ?? 'NA' }}</td>
+              <td>{{ qualification.obtMarks ?? 'NA' }}</td>
+              <td>{{ qualification.percentage ?? 'NA' }}%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
