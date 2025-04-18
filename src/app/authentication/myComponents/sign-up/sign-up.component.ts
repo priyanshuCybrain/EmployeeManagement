@@ -83,6 +83,9 @@ export class SignUpComponent {
   countriesPhoneData: any[] = [];
   enrollmentService: EnrollmentService = inject(EnrollmentService);
   CallingCountries: any[] = [];
+  profileImage: File | null = null;
+  previewUrl: string | ArrayBuffer | null = null;
+  imagePath: string | null = null; // To store the selected path or name
 
   constructor(
     private fb: FormBuilder,
@@ -113,6 +116,7 @@ export class SignUpComponent {
       classSelected: this.fb.array([]),
       States: [''],
       Cities: [''],
+      callingCountry: [''],
       teacherPhone: [
         '',
         [Validators.required, Validators.pattern(/^\d{10}$/)], // Requires exactly 10 digits
@@ -152,6 +156,7 @@ export class SignUpComponent {
       this.currentPage = 1; // Reset to the first page when rowsNo changes
     });
     this.form.get('rowsNo')?.setValue(this.itemsPerPage);
+
     this.CountryPhoneService.getCountryPhoneByCode().subscribe((data) => {
       // Filter and map countries to include only those with valid IDD (International Dialing Code)
       this.CallingCountries = data
@@ -193,6 +198,44 @@ export class SignUpComponent {
     }
   }
 
+  onFileSelected1(event: Event): void {
+    const fileInput = event.target as HTMLInputElement;
+    const file = fileInput.files?.[0];
+
+    if (file) {
+      this.profileImage = file;
+
+      // Optional: show preview
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.previewUrl = reader.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+
+      // Save preview URL for image display
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.previewUrl = e.target.result;
+      };
+      reader.readAsDataURL(file);
+
+      // Save file name or path
+      this.imagePath = file.name; // Just file name (e.g., "photo.jpg")
+      // OR, for full path (not recommended for security reasons, also not supported in most modern browsers):
+      // this.imagePath = input.value;
+
+      console.log('Selected image name:', this.imagePath);
+    }
+  }
+
   updateAllFormData(updatedData: any): void {
     // This pushes data into a ReplaySubject in MasterApiService.
     this.MasterApiService.emitTeacherData(updatedData);
@@ -220,6 +263,8 @@ export class SignUpComponent {
       address: [''],
       teacherTypeform: [''],
       teacherId: [null],
+      teacherPhone: [''],
+      callingCountry: [''],
     });
 
     this.States = [];

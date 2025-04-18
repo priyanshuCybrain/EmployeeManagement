@@ -144,7 +144,8 @@
         <div class="row mb-3 mt-4">
           <div class="col-md-3">
             <label>Calling Country</label>
-            <select class="form-control" (change)="onCountrySelect($event)">
+            <select class="form-control" formControlName="callingCountry" (change)="onCountrySelect($event)">
+              <option value="">Select Country ISD</option>
               <option *ngFor="let country of CallingCountries" [value]="country.name">
                 {{ country.name }}
               </option>
@@ -156,26 +157,38 @@
             <input type="tel" class="form-control" formControlName="teacherPhone" placeholder="Enter Phone Number">
             <small class="text-danger"
               *ngIf="teacherForm.get('teacherPhone')?.invalid && teacherForm.get('teacherPhone')?.touched">
-              Phone Number is required
+              give valid phone number
             </small>
           </div>
+
+          <div class="col-md-3">
+            <label for="profilePicture">Profile Picture</label>
+
+            <!-- Hidden file input -->
+            <input type="file" id="profilePicture" (change)="onFileSelected($event)" accept="image/*" hidden #fileInput>
+
+            <small class="text-muted d-block">Only image files are allowed (jpg, png, jpeg).</small>
+
+            <div *ngIf="previewUrl" class="mt-2 position-relative profile-picture-wrapper" (click)="fileInput.click()">
+              <!-- Profile image -->
+              <img [src]="previewUrl" alt="Profile Preview" class="img-thumbnail rounded-circle"
+                style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;">
+
+              <!-- Pencil icon overlay -->
+              <i class="fa fa-pencil pencil-icon"></i>
+            </div>
+
+            <!-- Fallback if no preview is available -->
+            <div *ngIf="!previewUrl" class="mt-2" (click)="fileInput.click()">
+              <div
+                class="rounded-circle bg-secondary d-flex justify-content-center align-items-center position-relative"
+                style="width: 150px; height: 150px; cursor: pointer;">
+                <i class="fa fa-camera text-white fa-2x"></i>
+              </div>
+            </div>
+          </div>
+
         </div>
-
-
-        <!-- </div> -->
-
-
-
-        <!-- <div class="col-md-3">
-            <label>Country</label>
-            <select class="form-control" (change)="onCountrySelect(($event.target as HTMLSelectElement).value)">
-
-              <option *ngFor="let country of Countries" [value]="country.root + (country.suffixes[0] || '')">
-                {{ country.name }} ({{ country.root }}{{ country.suffixes[0] || '' }})
-              </option>
-            </select>
-          </div> -->
-
 
         <div class="row mt-3 mb-3 ">
           <div class="col text-start">

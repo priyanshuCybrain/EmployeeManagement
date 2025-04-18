@@ -7,3 +7,27 @@
 .responsive-dialog {
   width: 40vw;
 }
+
+.profile-picture-wrapper {
+  display: inline-block;
+  position: relative;
+  width: 150px;
+  height: 150px;
+}
+
+.pencil-icon {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 6px;
+  border-radius: 50%;
+  font-size: 16px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.profile-picture-wrapper:hover .pencil-icon {
+  opacity: 1;
+}
