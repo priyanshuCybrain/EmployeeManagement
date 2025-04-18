@@ -21,6 +21,7 @@ import {
 import Swal from 'sweetalert2';
 import { EnrollmentService } from '../../../enrollment.service';
 import { MasterApiService } from '../../../ServiceFolder/master-api-service';
+import { CountryPhoneService } from '../../../ServiceFolder/countryPhone.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule, NavigationStart, Router } from '@angular/router';
 import { NgxPaginationModule } from 'ngx-pagination';
@@ -61,8 +62,6 @@ export class SignUpComponent {
   //teacherType: any[] = [];
   addedType: string = '';
   showInput: boolean = false;
-  currentPage = 1;
-  itemsPerPage = 5;
   filteredTeachers: any[] = [];
   searchText: string = '';
   classData: any[] = [];
@@ -75,17 +74,22 @@ export class SignUpComponent {
   submittedQualifications: any[] = [];
   expandQual: boolean = false;
   singleQualification: any[] = [];
-
+  NoOfRowsArr: number[] = [3, 5, 10]; // Options for rows per page
+  rowsNo: number;
   teacherType: { teacherType: number; teacherTypeName: string }[] = [];
-
+  form: FormGroup;
+  itemsPerPage = 5; // default value
+  currentPage = 1; // for tracking pagination
+  countriesPhoneData: any[] = [];
   enrollmentService: EnrollmentService = inject(EnrollmentService);
-  item: any;
+  CallingCountries: any[] = [];
 
   constructor(
     private fb: FormBuilder,
     private dialog: MatDialog,
     private MasterApiService: MasterApiService,
-    private router: Router
+    private router: Router,
+    private CountryPhoneService: CountryPhoneService
   ) {}
 
   @ViewChild('classPopup', { static: false }) classPopup!: ElementRef;
@@ -109,12 +113,27 @@ export class SignUpComponent {
       classSelected: this.fb.array([]),
       States: [''],
       Cities: [''],
+      teacherPhone: [
+        '',
+        [Validators.required, Validators.pattern(/^\d{10}$/)], // Requires exactly 10 digits
+      ],
       // submittedQualifications: [''],
     });
 
     this.getAllCountries();
     this.getAllTeacherType();
     this.getAllTeachers();
+
+    this.form = this.fb.group({
+      rowsNo: [this.itemsPerPage],
+    });
+
+    // Listen for dropdown value changes
+    this.form.get('rowsNo')?.valueChanges.subscribe((value) => {
+      this.itemsPerPage = +value;
+      this.currentPage = 1; // Reset to first page when rows per page changes
+    });
+
     this.getAllClassMasterData();
 
     if (this.classPopup) {
@@ -128,6 +147,50 @@ export class SignUpComponent {
         }
       }
     });
+    this.form.get('rowsNo')?.valueChanges.subscribe((val) => {
+      this.itemsPerPage = +val; // Update itemsPerPage based on rowsNo
+      this.currentPage = 1; // Reset to the first page when rowsNo changes
+    });
+    this.form.get('rowsNo')?.setValue(this.itemsPerPage);
+    this.CountryPhoneService.getCountryPhoneByCode().subscribe((data) => {
+      // Filter and map countries to include only those with valid IDD (International Dialing Code)
+      this.CallingCountries = data
+        .filter(
+          (country) => country.idd && country.idd.root && country.idd.suffixes
+        )
+        .map((country) => ({
+          name: country.name?.common || 'N/A', // Country name
+          root: country.idd.root, // Root (e.g., '+1' for US, '+91' for India)
+          suffix: country.idd.suffixes[0] || '', // Suffix if available
+        }));
+
+      console.log('Calling Countries:', this.CallingCountries);
+    });
+  }
+  onCountrySelect(event: Event) {
+    const selectedCountry = (event.target as HTMLSelectElement).value;
+
+    const country = this.CallingCountries.find(
+      (c) => c.name === selectedCountry
+    );
+
+    if (country) {
+      const fullCode = country.root + country.suffix; // Combine root and suffix
+
+      // Patch the country code into the phone number field
+      this.teacherForm.patchValue({
+        teacherPhone: fullCode,
+      });
+
+      // Optional: Format the phone number to include a placeholder for the rest of the number
+      const phoneInput = this.teacherForm.get('teacherPhone');
+      if (phoneInput) {
+        phoneInput.setValidators([
+          Validators.required,
+          Validators.pattern(/^\d{10}$/),
+        ]); // Enforce exactly 10 digits
+      }
+    }
   }
 
   updateAllFormData(updatedData: any): void {
@@ -250,7 +313,8 @@ export class SignUpComponent {
         teacherTypeName,
       })
     );
-    console.log('Teachers :', this.teachers);
+    // console.log('Teachers :', this.teachers);
+    // console.log('filteredTeachers :', this.filteredTeachers);
   }
 
   async getAllClassMasterData() {
@@ -307,11 +371,6 @@ export class SignUpComponent {
       console.error('Error submitting form:', error);
     }
   }
-
-  // submitTeacherForm() {
-  //   const teacherData = this.teacherForm.value;
-  //   this.MasterApiService.emitTeacherData(teacherData);
-  // }
 
   async editTeacher(teacher: any) {
     // sends the selected teacher data to the service
@@ -535,4 +594,3 @@ export class SignUpComponent {
     });
   }
 }
-// changes made from the git

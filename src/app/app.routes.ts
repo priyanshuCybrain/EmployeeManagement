@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 import { MasterPageComponent } from './authentication/master-page/master-page.component';
 import { SignInComponent } from './authentication';
-
 export const appRoutes: Routes = [
   {
     path: 'sign-in',

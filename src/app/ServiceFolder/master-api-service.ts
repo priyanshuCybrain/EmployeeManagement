@@ -1,10 +1,13 @@
 import { Injectable, EventEmitter } from '@angular/core';
-import { ReplaySubject } from 'rxjs';
+import { Observable, ReplaySubject } from 'rxjs';
 import { ApiService } from './apiservice.service';
 
 @Injectable({ providedIn: 'root' })
 export class MasterApiService {
+  private apiUrl = 'https://restcountries.com/v3.1/all';
+  http: any;
   constructor(private httpclient: ApiService) {}
+  teacherDataEmitter = new EventEmitter<any>();
 
   private teacherDataSubject = new ReplaySubject<any>(1);
   // the data is coming from the signup component and is being emitted to the master service.
@@ -114,5 +117,7 @@ export class MasterApiService {
     return await this.httpclient.GET(`/Qualification/${teacherId}`);
   }
 
-  teacherDataEmitter = new EventEmitter<any>();
+  async getAllCountries(): Promise<any[]> {
+    return await this.httpclient.GET(this.apiUrl);
+  }
 }
